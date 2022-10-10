@@ -1,2 +1,10 @@
-udpListen:
-	gcc -Wall -g -std=c99 -D _POSIX_C_SOURCE=200809L -Werror network_communication.c -o udpListen -lpthread
+CC=cc
+CCFLAGS= -g -std=c99 -Wall -Werror
+
+all: socket
+
+%.o: %.c
+	$(CC) -c $(CCFLAGS) $<
+
+socket:
+	%(CC) -o socket scket.c-Wall -lpthread
