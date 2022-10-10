@@ -1,10 +1,13 @@
-CC=cc
-CCFLAGS= -g -std=c99 -Wall -Werror
+CFLAGS = -g -std=c99 -Wall -Werror
+CLIBS = -lpthread
 
-all: socket
+C_SOURCES := $(wildcard *.c)
+C_EXECUTABLE :=$(C_SOURCES:.c=)
 
-%.o: %.c
-	$(CC) -c $(CCFLAGS) $<
+all:$(C_EXECUTABLE) $(CPP_EXECUTABLE)
 
-socket:
-	%(CC) -o socket scket.c-Wall -lpthread
+$(C_EXECUTABLE):$(C_SOURCES)
+		$(CC) $< $(CFLAGS) $(CLIBS) -o $@
+
+clean:
+	rm -rf $(C_EXECUTABLE)
