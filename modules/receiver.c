@@ -1,35 +1,33 @@
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 #include <pthread.h>
-#include <netdb.h>
+#include <netdb.h> 
 #include "receiver.h"
 
 #define MAX_LEN 1024
-#define PORT    22110
 
-static pthread_t ReceiverID;
-static int socketD;
+static int s_port;
+static pthread_t s_receiverID;
+static struct sockaddr_in s_socket;
 
 void* Receiver_thread(void* arg) {
-     // initializing the socket
-    struct sockaddr_in sin;
-    memset(&sin, 0, sizeof(sin)); // clearing out garbage values
+    // initializing the socket
+    memset(&s_socket, 0, sizeof(s_socket)); // clearing out garbage values
 
-    sin.sin_family = AF_INET;
-    sin.sin_addr.s_addr = htonl(INADDR_ANY);
-    sin.sin_port = htons(PORT);
+    s_socket.sin_family = AF_INET;
+    s_socket.sin_addr.s_addr = htonl(INADDR_ANY);
+    s_socket.sin_port = htons(s_port);
 
-    socketD = socket(PF_INET  , SOCK_DGRAM, 0);
-    bind(socketD, (struct sockaddr*) &sin, sizeof(struct sockaddr_in));
+    int s_socketDescriptor = socket(PF_INET  , SOCK_DGRAM, 0);
+    bind(s_socketDescriptor, (struct sockaddr*) &s_socket, sizeof(struct sockaddr_in));
 
     while(1) {
         // receiving data
-        struct sockaddr_in sinRemote; 
+        struct sockaddr_in sinRemote;
         unsigned int sin_len = sizeof(sinRemote);
         char bufferRx[MAX_LEN];
 
-        int bytesRx = recvfrom(socketD,
+        int bytesRx = recvfrom(s_socketDescriptor,
                            bufferRx, MAX_LEN, 0,
                            (struct sockaddr*)&sinRemote, &sin_len);
 
@@ -43,12 +41,11 @@ void* Receiver_thread(void* arg) {
     return NULL;
 }
 
-void Receiver_init(void) {
-    pthread_create(&ReceiverID, NULL, Receiver_thread, NULL);
+void Receiver_init(struct sockaddr_in* s) {
+    s_socket = *s;
+    pthread_create(&s_receiverID, NULL, Receiver_thread, NULL);
 }
 
 void Receiver_shutdown(void) {
-    pthread_cancel(ReceiverID);
-
-    pthread_join(ReceiverID, NULL);
+    pthread_join(s_receiverID, NULL);
 }

@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "netdb.h": "c"
+        "netdb.h": "c",
+        "receiver.h": "c",
+        "cmath": "c"
     }
 }

@@ -1,7 +1,9 @@
 #ifndef _UDP_SENDER_H_
 #define _UDP_SENDER_H_
 
-void Sender_init(void);
+#include <netdb.h>
+
+void Sender_init(struct sockaddr_in* s);
 
 void Sender_shutdown(void);
 
