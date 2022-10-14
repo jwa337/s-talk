@@ -9,6 +9,7 @@
 static int s_port;
 static pthread_t s_receiverID;
 static struct sockaddr_in s_socket;
+static int s_socket_descriptor;
 
 void* Receiver_thread(void* arg) {
     // initializing the socket
@@ -41,8 +42,9 @@ void* Receiver_thread(void* arg) {
     return NULL;
 }
 
-void Receiver_init(struct sockaddr_in* s) {
+void Receiver_init(struct sockaddr_in* s, int socket_descriptor) {
     s_socket = *s;
+    s_socket_descriptor = socket_descriptor;
     pthread_create(&s_receiverID, NULL, Receiver_thread, NULL);
 }
 

@@ -3,7 +3,7 @@
 
 #include <netdb.h>
 
-void Sender_init(struct sockaddr_in* s);
+void Sender_init(struct sockaddr_in* s, int socket_descriptor);
 
 void Sender_shutdown(void);
 

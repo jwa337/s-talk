@@ -3,7 +3,7 @@
 
 #include <netdb.h>
 
-struct sockaddr_in* Socket_init(int port, struct sockaddr_in* s);
+int Socket_init(int port, struct sockaddr_in* s);
 
 void Socket_close(struct sockaddr_in s);
 

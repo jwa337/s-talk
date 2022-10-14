@@ -1,7 +1,9 @@
 #include <netdb.h>
+#include <string.h>
+#include <unistd.h>
 #include "socket.h"
 
- struct sockaddr_in* Socket_init(int port, struct sockaddr_in* s) {
+int Socket_init(int port, struct sockaddr_in* s) {
     // initializing the socket
     memset(s, 0, sizeof(*s)); // clearing out garbage values
 
@@ -12,7 +14,7 @@
     int s_socketDescriptor = socket(PF_INET  , SOCK_DGRAM, 0);
     bind(s_socketDescriptor, (struct sockaddr*) &s, sizeof(struct sockaddr_in));
 
-    return s;
+    return s_socketDescriptor;
 }
 
 void Socket_close(struct sockaddr_in s) {

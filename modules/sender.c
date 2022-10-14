@@ -5,6 +5,7 @@
 
 static pthread_t s_senderID;
 static struct sockaddr_in s_socket;
+static int s_socket_descriptor;
 
 void* Sender_thread(void* arg) {
     // sending data
@@ -17,8 +18,9 @@ void* Sender_thread(void* arg) {
     return NULL;
 }
 
-void Sender_init(struct sockaddr_in* s) {
+void Sender_init(struct sockaddr_in* s, int socket_desciptor) {
     s_socket = *s;
+    s_socket_descriptor = socket_desciptor;
     pthread_create(&s_senderID, NULL, Sender_thread, NULL);
 }
 
