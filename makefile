@@ -1,13 +1,13 @@
 CFLAGS = -g -std=c99 -Wall -Werror
 CLIBS = -lpthread
 
-C_SOURCES := $(wildcard *.c)
-C_EXECUTABLE :=$(C_SOURCES:.c=)
+all:s-talk
 
-all:$(C_EXECUTABLE) $(CPP_EXECUTABLE)
+s-talk:
+	gcc s-talk.c modules/input.c modules/output.c modules/receiver.c modules/sender.c $(CFLAGS) $(CLIBS) -o $@
 
-$(C_EXECUTABLE):$(C_SOURCES)
-		$(CC) $< $(CFLAGS) $(CLIBS) -o $@
+run: s-talk
+	./s-talk
 
 clean:
-	rm -rf $(C_EXECUTABLE)
+	rm -rf s-talk
