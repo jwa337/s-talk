@@ -9,12 +9,15 @@ static int s_socket_descriptor;
 
 void* Sender_thread(void* arg) {
     // sending data
-    // char message[MAX_LEN];
-    // scanf("%s", message);
-    // sin_len = sizeof(sinRemote);
-    // sendto(s,
-    //     message, strlen(message), 0,
-    //     (struct sockaddr *)&sinRemote, sin_len);
+    while (1) {
+        char message[MAX_LEN];
+        scanf("%s", message);
+        int sin_len = sizeof(sinRemote);
+        sendto(s,
+            message, strlen(message), 0,
+        (   struct sockaddr *)&sinRemote, sin_len);
+    }
+
     return NULL;
 }
 

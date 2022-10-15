@@ -6,9 +6,10 @@
 #include "modules/input.h"
 #include "modules/output.h"
 #include "modules/socket.h"
+//////////////////// adding sinRemote to socket.c so sender and receiver shares a same sinRemote
 
 int main(int argc, char** argv) {
-    if (argc < 4) {
+    if (argc != 4) {
         exit(0);
     }
 

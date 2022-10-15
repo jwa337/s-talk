@@ -12,23 +12,13 @@ static struct sockaddr_in s_socket;
 static int s_socket_descriptor;
 
 void* Receiver_thread(void* arg) {
-    // initializing the socket
-    memset(&s_socket, 0, sizeof(s_socket)); // clearing out garbage values
-
-    s_socket.sin_family = AF_INET;
-    s_socket.sin_addr.s_addr = htonl(INADDR_ANY);
-    s_socket.sin_port = htons(s_port);
-
-    int s_socketDescriptor = socket(PF_INET  , SOCK_DGRAM, 0);
-    bind(s_socketDescriptor, (struct sockaddr*) &s_socket, sizeof(struct sockaddr_in));
-
     while(1) {
         // receiving data
         struct sockaddr_in sinRemote;
         unsigned int sin_len = sizeof(sinRemote);
         char bufferRx[MAX_LEN];
 
-        int bytesRx = recvfrom(s_socketDescriptor,
+        int bytesRx = recvfrom(s_socket_descriptor,
                            bufferRx, MAX_LEN, 0,
                            (struct sockaddr*)&sinRemote, &sin_len);
 
