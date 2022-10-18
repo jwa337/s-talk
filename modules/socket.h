@@ -5,6 +5,6 @@
 
 int Socket_init(int port, int connectPort, struct sockaddr_in* s, struct sockaddr_in* sinRemote);
 
-void Socket_close(struct sockaddr_in s);
+void Socket_close(int socketDescriptor);
 
 #endif

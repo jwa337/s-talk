@@ -14,12 +14,12 @@ int Socket_init(int myPort, int connectPort, struct sockaddr_in* s, struct socka
 
     sinRemote->sin_port = htons(connectPort);
 
-    int s_socketDescriptor = socket(PF_INET  , SOCK_DGRAM, 0);
-    bind(s_socketDescriptor, (struct sockaddr*) &s, sizeof(struct sockaddr_in));
+    int s_socketDescriptor = socket(PF_INET, SOCK_DGRAM, 0);
+    bind(s_socketDescriptor, (struct sockaddr*) s, sizeof(struct sockaddr_in));
 
     return s_socketDescriptor;
 }
 
-void Socket_close(struct sockaddr_in s) {
-    //close(s);
+void Socket_close(int socketDescriptor) {
+    close(socketDescriptor);
 }
