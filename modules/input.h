@@ -1,7 +1,9 @@
 #ifndef _KEYBOARD_INPUT_H_
 #define _KEYBOARD_INPUT_H_
 
-void Input_init(void);
+#include "../list/list.h"
+
+void Input_init(List* inputLst);
 
 void Input_shutdown(void);
 

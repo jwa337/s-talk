@@ -11,7 +11,8 @@ static char* message;
 static pthread_t s_senderID;
 static struct sockaddr_in s_socket;
 static struct sockaddr_in s_sinRemote;
-static int s_socket_descriptor;
+static int s_socketDescriptor;
+static List* s_lst;
 
 void get_meesage(char* message) {
     size_t ln = -1;
@@ -29,24 +30,20 @@ void* Sender_thread(void* arg) {
     while (1) {
         message = malloc(MAX_LEN);
         get_meesage(message);
-
-        if (message[0] == '!' && strlen(message) == 1) {
-            Sender_shutdown();
-        }
-
-        int sin_len = sizeof(s_sinRemote);
-        sendto(s_socket_descriptor,
+        int sinLen = sizeof(s_sinRemote);
+        sendto(s_socketDescriptor,
             message, strlen(message), 0,
-        (   struct sockaddr *)&s_sinRemote, sin_len);
+        (   struct sockaddr *)&s_sinRemote, sinLen);
     }
 
     pthread_exit(NULL);
 }
 
-void Sender_init(struct sockaddr_in* s, struct sockaddr_in* sinRemote, int socket_desciptor) {
+void Sender_init(struct sockaddr_in* s, struct sockaddr_in* sinRemote, int socketDescriptor, List* inputLst) {
     s_socket = *s;
     s_sinRemote = *sinRemote;
-    s_socket_descriptor = socket_desciptor;
+    s_socketDescriptor = socketDescriptor;
+    s_lst = inputLst;
     pthread_create(&s_senderID, NULL, Sender_thread, NULL);
 }
 

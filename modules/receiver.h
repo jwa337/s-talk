@@ -2,8 +2,9 @@
 #define _UDP_RECEIVER_H_
 
 #include <netdb.h>
+#include "../list/list.h"
 
-void Receiver_init(struct sockaddr_in* s, struct sockaddr_in* sinRemote, int socket_descriptor);
+void Receiver_init(struct sockaddr_in* s, struct sockaddr_in* sinRemote, int socketDescriptor, List* outputLst);
 
 void Receiver_shutdown(void);
 

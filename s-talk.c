@@ -6,7 +6,7 @@
 #include "modules/input.h"
 #include "modules/output.h"
 #include "modules/socket.h"
-//////////////////// adding sinRemote to socket.c so sender and receiver shares a same sinRemote
+#include "list/list.h"
 
 int main(int argc, char** argv) {
     if (argc != 4) {
@@ -15,15 +15,22 @@ int main(int argc, char** argv) {
 
     printf("Starting s-talk session with %s and %s\n", argv[1], argv[3]);
 
+    List* inputLst = List_create();
+    List* outputLst = List_create();
+
     struct sockaddr_in s;
     struct sockaddr_in sinRemote;
-    int socket_desciptor = Socket_init(atoi(argv[1]), atoi(argv[3]), &s, &sinRemote);
-    Receiver_init(&s, &sinRemote, socket_desciptor);
-    Sender_init(&s, &sinRemote, socket_desciptor);
+    int socketDescriptor = Socket_init(atoi(argv[1]), atoi(argv[3]), &s, &sinRemote);
+    Receiver_init(&s, &sinRemote, socketDescriptor, outputLst);
+    Sender_init(&s, &sinRemote, socketDescriptor, inputLst);
+    Input_init(inputLst);
 
     Receiver_shutdown();
     Sender_shutdown();
-    Socket_close(socket_desciptor);
+    Input_shutdown();
+    Socket_close(socketDescriptor);
+
+    printf("Session Ended...\n");
 
     return 0;
 }
