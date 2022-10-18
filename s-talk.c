@@ -21,9 +21,6 @@ int main(int argc, char** argv) {
     Receiver_init(&s, &sinRemote, socket_desciptor);
     Sender_init(&s, &sinRemote, socket_desciptor);
 
-    char terminated;
-    scanf("%c", &terminated);
-
     Receiver_shutdown();
     Sender_shutdown();
     Socket_close(socket_desciptor);

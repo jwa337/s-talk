@@ -25,7 +25,7 @@ void* Receiver_thread(void* arg) {
         int terminate_index = (bytesRx < MAX_LEN) ? bytesRx : MAX_LEN - 1;
         bufferRx[terminate_index] = '\0';
         long remotePort = ntohs(s_sinRemote.sin_port);
-        printf("(Port%ld) %s \n", remotePort, bufferRx);
+        printf("(port %ld) %s\n" , remotePort, bufferRx);
     }
 
     pthread_exit(NULL);
