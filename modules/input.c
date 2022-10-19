@@ -7,8 +7,12 @@
 #define MAX_LEN 1024
  
 static pthread_t s_inputID;
-static List* s_Lst;
+static List* s_lst;
 static char* msg;
+
+// synchronization
+static pthread_cond_t s_signalInputCondVar;
+static pthread_mutex_t s_inputMutex;
 
 void* Input_thread(void* arg) {
     msg = malloc(MAX_LEN);
@@ -22,15 +26,24 @@ void* Input_thread(void* arg) {
         msg[length] = '\0';
     }
 
+    List_append(s_lst, msg);
+    pthread_mutex_lock(&s_inputMutex);
+    {
+        pthread_cond_signal(&s_signalInputCondVar);
+    }
+    pthread_mutex_unlock(&s_inputMutex);
+
     pthread_exit(NULL);
 }
 
-void Input_init(List* inputLst) {
-    s_Lst = inputLst;
+void Input_init(List* inputLst, pthread_cond_t* inputCondVar, pthread_mutex_t* inputMutex) {
+    s_lst = inputLst;
+    s_signalInputCondVar = *inputCondVar;
+    s_inputMutex = *inputMutex;
     pthread_create(&s_inputID , NULL, Input_thread, NULL);
 }
 
 void Input_shutdown(void) {
-    free(msg);
+    List_free(s_lst, free);
     pthread_join(s_inputID, NULL);
 }
