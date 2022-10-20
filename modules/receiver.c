@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
 #include <netdb.h> 
@@ -6,37 +7,59 @@
 #include "receiver.h"
 
 #define MAX_LEN 256
+#define MAX_SIZE 100
 
 static pthread_t s_receiverID;
 static struct sockaddr_in* s_sinRemote;
 static int s_socketDescriptor;
 static List* s_lst;
+static char* msg;
+
+// synchronziation
+static pthread_cond_t* s_bufAvail;
+static pthread_cond_t* s_itemAvail;
+static pthread_mutex_t* s_outputMutex;
 
 void* Receiver_thread(void* arg) {
     while(1) {
         // receiving data
         unsigned int sinLen = sizeof(*s_sinRemote);
-        char bufferRx[MAX_LEN];
+        msg = malloc(MAX_LEN);
 
         int bytesRx = recvfrom(s_socketDescriptor,
-                           bufferRx, MAX_LEN, 0,
+                           msg, MAX_LEN, 0,
                            (struct sockaddr*) s_sinRemote, &sinLen);
 
         // adding the null terminating value to the end of the string
         int terminateIndex = (bytesRx < MAX_LEN) ? bytesRx : MAX_LEN - 1;
-        bufferRx[terminateIndex] = '\0';
-        long remotePort = ntohs(s_sinRemote->sin_port);
-        printf("(port %ld) %s\n" , remotePort, bufferRx);
-        //write(s_socketDescriptor, bufferRx, strlen(bufferRx)+1);
+        msg[terminateIndex] = '\0';
+        
+        if (List_count(s_lst) == MAX_SIZE) {
+            pthread_mutex_lock(s_outputMutex);
+            { 
+                pthread_cond_wait(s_bufAvail, s_outputMutex);
+            }
+            pthread_mutex_unlock(s_outputMutex);
+        }
+
+        List_prepend(s_lst, msg);
+        pthread_mutex_lock(s_outputMutex);
+        {
+            pthread_cond_signal(s_itemAvail);
+        }
+        pthread_mutex_unlock(s_outputMutex);
     }
 
     pthread_exit(NULL);
 }
 
-void Receiver_init(struct sockaddr_in* sinRemote, int socketDescriptor, List* outputLst) {
+void Receiver_init(struct sockaddr_in* sinRemote, int socketDescriptor, List* outputLst, pthread_cond_t* bufAvail, pthread_cond_t* itemAvail, pthread_mutex_t* outputMutex) {
     s_sinRemote = sinRemote;
     s_socketDescriptor = socketDescriptor;
     s_lst = outputLst;
+    s_bufAvail = bufAvail;
+    s_itemAvail = itemAvail;
+    s_outputMutex = outputMutex;
     pthread_create(&s_receiverID, NULL, Receiver_thread, NULL);
 }
 

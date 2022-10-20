@@ -12,7 +12,6 @@ static List* s_lst;
 static char* msg;
 
 // synchronization
-// initializing probllemds
 static pthread_cond_t* s_bufAvail;
 static pthread_cond_t* s_itemAvail;
 static pthread_mutex_t* s_inputMutex;
