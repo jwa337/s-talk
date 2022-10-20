@@ -19,15 +19,20 @@ int main(int argc, char** argv) {
     List* inputLst = List_create();
     List* outputLst = List_create();
 
-    pthread_cond_t s_waitingInputCondVar = PTHREAD_COND_INITIALIZER;
-    pthread_mutex_t s_inputMutex = PTHREAD_MUTEX_INITIALIZER;
+    // condition variables and mutexes for reading input and sending through UDP
+    pthread_cond_t bufAvail = PTHREAD_COND_INITIALIZER;
+    pthread_cond_t itemAvail = PTHREAD_COND_INITIALIZER;
+    pthread_mutex_t inputMutex = PTHREAD_MUTEX_INITIALIZER;
+
+    // conditon variables and mutexes for receiving from UDP and output
+
 
     struct sockaddr_in s;
     struct sockaddr_in sinRemote;
     int socketDescriptor = Socket_init(atoi(argv[1]), atoi(argv[3]), &s, &sinRemote);
-    Input_init(inputLst, &s_waitingInputCondVar, &s_inputMutex);
-    Sender_init(&s, &sinRemote, socketDescriptor, inputLst, &s_waitingInputCondVar, &s_inputMutex);
-    Receiver_init(&s, &sinRemote, socketDescriptor, outputLst);
+    Input_init(inputLst, &bufAvail, &itemAvail, &inputMutex);
+    Sender_init(&sinRemote, socketDescriptor, inputLst, &bufAvail, &itemAvail, &inputMutex);
+    Receiver_init(&sinRemote, socketDescriptor, outputLst);
 
     Input_shutdown();
     Sender_shutdown();
