@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <netdb.h>
 #include <pthread.h>
 #include "modules/receiver.h"

@@ -33,6 +33,11 @@ void* Receiver_thread(void* arg) {
         // adding the null terminating value to the end of the string
         int terminateIndex = (bytesRx < MAX_LEN) ? bytesRx : MAX_LEN - 1;
         msg[terminateIndex] = '\0';
+
+        if (msg == '!') {
+            // ... do something to cancle the communication
+            // ... pthread_cancle(), 
+        }
         
         if (List_count(s_lst) == MAX_SIZE) {
             pthread_mutex_lock(s_outputMutex);

@@ -40,7 +40,12 @@ void* Sender_thread(void* arg) {
         int sinLen = sizeof(*s_sinRemote);
         sendto(s_socketDescriptor,
             msg, strlen(msg), 0,
-        (   struct sockaddr *)s_sinRemote, sinLen);
+            (struct sockaddr *)s_sinRemote, sinLen);
+
+        if (msg == '!') {
+            // ... do something to cancle the communication
+            // ... pthread_cancle(), 
+        }
     }
 
     pthread_exit(NULL);
