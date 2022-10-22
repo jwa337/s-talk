@@ -1,9 +1,7 @@
-#include "sender.h"
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <pthread.h>
-#include <netdb.h>
+#include "sender.h"
+#include "input.h"
 
 #define MAX_LEN 256
 
@@ -42,13 +40,10 @@ void* Sender_thread(void* arg) {
             msg, strlen(msg), 0,
             (struct sockaddr *)s_sinRemote, sinLen);
 
-        if (msg == '!') {
-            // ... do something to cancle the communication
-            // ... pthread_cancle(), 
+        if (msg[0] == '!' && strlen(msg) == 1) {
+            pthread_exit(NULL);
         }
     }
-
-    pthread_exit(NULL);
 }
 
 void Sender_init(struct sockaddr_in* sinRemote, int socketDescriptor, List* inputLst, pthread_cond_t* bufAvail, pthread_cond_t* itemAvail, pthread_mutex_t* inputMutex) {
@@ -61,7 +56,8 @@ void Sender_init(struct sockaddr_in* sinRemote, int socketDescriptor, List* inpu
     pthread_create(&s_senderID, NULL, Sender_thread, NULL);
 }
 
-void Sender_shutdown(void) {
-    free(msg);
+void Sender_shutdown() {
     pthread_join(s_senderID, NULL);
+
+    free(msg);
 }

@@ -8,6 +8,6 @@
 void Receiver_init(struct sockaddr_in* sinRemote, int socketDescriptor, List* outputLst,
                     pthread_cond_t* bufAvail, pthread_cond_t* itemAvail, pthread_mutex_t* outputMutex);
 
-void Receiver_shutdown(void);
+void Receiver_shutdown();
 
 #endif

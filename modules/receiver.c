@@ -1,10 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <pthread.h>
-#include <netdb.h> 
-#include <unistd.h>
 #include "receiver.h"
+#include "output.h"
 
 #define MAX_LEN 256
 #define MAX_SIZE 100
@@ -33,11 +31,6 @@ void* Receiver_thread(void* arg) {
         // adding the null terminating value to the end of the string
         int terminateIndex = (bytesRx < MAX_LEN) ? bytesRx : MAX_LEN - 1;
         msg[terminateIndex] = '\0';
-
-        if (msg == '!') {
-            // ... do something to cancle the communication
-            // ... pthread_cancle(), 
-        }
         
         if (List_count(s_lst) == MAX_SIZE) {
             pthread_mutex_lock(s_outputMutex);
@@ -53,9 +46,12 @@ void* Receiver_thread(void* arg) {
             pthread_cond_signal(s_itemAvail);
         }
         pthread_mutex_unlock(s_outputMutex);
-    }
 
-    pthread_exit(NULL);
+        if (msg[0] == '!' && strlen(msg) == 1) {
+            printf("Receieved %s, ready to shutdown..\n", msg);
+            pthread_exit(NULL);
+        }
+    }
 }
 
 void Receiver_init(struct sockaddr_in* sinRemote, int socketDescriptor, List* outputLst, pthread_cond_t* bufAvail, pthread_cond_t* itemAvail, pthread_mutex_t* outputMutex) {
@@ -68,6 +64,6 @@ void Receiver_init(struct sockaddr_in* sinRemote, int socketDescriptor, List* ou
     pthread_create(&s_receiverID, NULL, Receiver_thread, NULL);
 }
 
-void Receiver_shutdown(void) {
+void Receiver_shutdown() {
     pthread_join(s_receiverID, NULL);
 }

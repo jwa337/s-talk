@@ -40,9 +40,9 @@ int main(int argc, char** argv) {
     Receiver_init(&sinRemote, socketDescriptor, outputLst, &outputBufAvail, &outputItemAvail, &outputMutex);
     Output_init(outputLst, &outputBufAvail, &outputItemAvail, &outputMutex);
 
-    Input_shutdown();
     Sender_shutdown();
     Receiver_shutdown();
+    Input_shutdown();
     Output_shutdown();
     Socket_close(socketDescriptor);
 

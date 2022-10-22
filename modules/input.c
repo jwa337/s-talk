@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <pthread.h>
 #include "input.h"
 
 #define MAX_LEN 256
@@ -57,7 +56,10 @@ void Input_init(List* inputLst, pthread_cond_t* bufAvail, pthread_cond_t* itemAv
     pthread_create(&s_inputID , NULL, Input_thread, NULL);
 }
 
-void Input_shutdown(void) {
-    List_free(s_lst, free);
+void Input_shutdown() {
     pthread_join(s_inputID, NULL);
+}
+
+void Input_cancel() {
+    pthread_cancel(s_inputID);
 }

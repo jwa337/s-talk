@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <pthread.h>
 #include "output.h"
 
 static pthread_t s_outputID;
@@ -44,7 +43,12 @@ void Output_init(List* inputLst, pthread_cond_t* bufAvail, pthread_cond_t* itemA
     pthread_create(&s_outputID, NULL, Output_thread, NULL);
 }
 
-void Output_shutdown(void) {
-    free(msg);
+void Output_shutdown() {
     pthread_join(s_outputID, NULL);
+    free(msg);
+}
+
+void Output_cancel() {
+    pthread_cancel(s_outputID);
+    free(msg);
 }

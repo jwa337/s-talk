@@ -8,6 +8,6 @@
 void Sender_init(struct sockaddr_in* sinRemote, int socket_descriptor, List* inputLst, 
                     pthread_cond_t* bufAvail, pthread_cond_t* itemAvail, pthread_mutex_t* inputMutex);
 
-void Sender_shutdown(void);
+void Sender_shutdown();
 
 #endif
