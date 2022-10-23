@@ -46,12 +46,9 @@ void* Receiver_thread(void* arg) {
             pthread_cond_signal(s_itemAvail);
         }
         pthread_mutex_unlock(s_outputMutex);
-
-        if (msg[0] == '!' && strlen(msg) == 1) {
-            printf("Receieved %s, ready to shutdown..\n", msg);
-            pthread_exit(NULL);
-        }
     }
+
+    return(NULL);
 }
 
 void Receiver_init(struct sockaddr_in* sinRemote, int socketDescriptor, List* outputLst, pthread_cond_t* bufAvail, pthread_cond_t* itemAvail, pthread_mutex_t* outputMutex) {
@@ -65,5 +62,9 @@ void Receiver_init(struct sockaddr_in* sinRemote, int socketDescriptor, List* ou
 }
 
 void Receiver_shutdown() {
+    pthread_cancel(s_receiverID);
     pthread_join(s_receiverID, NULL);
+
+    free(msg);
+    msg = NULL;
 }

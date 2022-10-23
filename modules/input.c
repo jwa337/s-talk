@@ -44,8 +44,7 @@ void* Input_thread(void* arg) {
         pthread_mutex_unlock(s_inputMutex);
     }
 
-
-    pthread_exit(NULL);
+    return(NULL);
 }
 
 void Input_init(List* inputLst, pthread_cond_t* bufAvail, pthread_cond_t* itemAvail, pthread_mutex_t* inputMutex) {
@@ -57,9 +56,9 @@ void Input_init(List* inputLst, pthread_cond_t* bufAvail, pthread_cond_t* itemAv
 }
 
 void Input_shutdown() {
-    pthread_join(s_inputID, NULL);
-}
-
-void Input_cancel() {
     pthread_cancel(s_inputID);
+    pthread_join(s_inputID, NULL);
+
+    free(msg);
+    msg = NULL;
 }

@@ -5,6 +5,7 @@
         "cmath": "c",
         "pthread.h": "c",
         "sender.h": "c",
-        "output.h": "c"
+        "output.h": "c",
+        "shutdownmanager.h": "c"
     }
 }

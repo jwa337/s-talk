@@ -2,6 +2,7 @@
 #include <string.h>
 #include "sender.h"
 #include "input.h"
+#include "../manager/shutdownManager.h"
 
 #define MAX_LEN 256
 
@@ -41,9 +42,11 @@ void* Sender_thread(void* arg) {
             (struct sockaddr *)s_sinRemote, sinLen);
 
         if (msg[0] == '!' && strlen(msg) == 1) {
-            pthread_exit(NULL);
+            TriggerShutdown();
         }
     }
+   
+    return(NULL);
 }
 
 void Sender_init(struct sockaddr_in* sinRemote, int socketDescriptor, List* inputLst, pthread_cond_t* bufAvail, pthread_cond_t* itemAvail, pthread_mutex_t* inputMutex) {
@@ -57,7 +60,9 @@ void Sender_init(struct sockaddr_in* sinRemote, int socketDescriptor, List* inpu
 }
 
 void Sender_shutdown() {
+    pthread_cancel(s_senderID);
     pthread_join(s_senderID, NULL);
 
     free(msg);
+    msg = NULL;
 }

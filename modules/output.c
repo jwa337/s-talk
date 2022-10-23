@@ -1,6 +1,8 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include "output.h"
+#include "../manager/shutdownManager.h"
 
 static pthread_t s_outputID;
 static List* s_lst;
@@ -30,9 +32,13 @@ void* Output_thread(void* arg) {
         pthread_mutex_unlock(s_outputMutex);
 
         puts(msg);
+
+        if (msg[0] == '!' && strlen(msg) == 1) {
+            TriggerShutdown();
+        }
     }
     
-    pthread_exit(NULL);
+    return(NULL);
 }
 
 void Output_init(List* inputLst, pthread_cond_t* bufAvail, pthread_cond_t* itemAvail, pthread_mutex_t* outputMutex) {
@@ -44,11 +50,9 @@ void Output_init(List* inputLst, pthread_cond_t* bufAvail, pthread_cond_t* itemA
 }
 
 void Output_shutdown() {
-    pthread_join(s_outputID, NULL);
-    free(msg);
-}
-
-void Output_cancel() {
     pthread_cancel(s_outputID);
+    pthread_join(s_outputID, NULL);
+
     free(msg);
+    msg = NULL;
 }

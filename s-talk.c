@@ -8,6 +8,7 @@
 #include "modules/output.h"
 #include "modules/socket.h"
 #include "list/list.h"
+#include "manager/shutdownManager.h"
 
 int main(int argc, char** argv) {
     // user must specifies their port, the machine and port they wish to connect to
@@ -39,6 +40,11 @@ int main(int argc, char** argv) {
     Sender_init(&sinRemote, socketDescriptor, inputLst, &inputBufAvail, &inputItemAvail, &inputMutex);
     Receiver_init(&sinRemote, socketDescriptor, outputLst, &outputBufAvail, &outputItemAvail, &outputMutex);
     Output_init(outputLst, &outputBufAvail, &outputItemAvail, &outputMutex);
+
+
+    pthread_cond_t shutdownCondVar = PTHREAD_COND_INITIALIZER;
+    pthread_mutex_t shutdownMutex = PTHREAD_MUTEX_INITIALIZER;
+    WaitForShutDown(&shutdownCondVar, &shutdownMutex);
 
     Sender_shutdown();
     Receiver_shutdown();
