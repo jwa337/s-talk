@@ -58,12 +58,19 @@ void Receiver_init(struct sockaddr_in* sinRemote, int socketDescriptor, List* ou
     s_bufAvail = bufAvail;
     s_itemAvail = itemAvail;
     s_outputMutex = outputMutex;
-    pthread_create(&s_receiverID, NULL, Receiver_thread, NULL);
+    if (pthread_create(&s_receiverID, NULL, Receiver_thread, NULL) != 0) {
+        exit(0);
+    }
 }
 
 void Receiver_shutdown() {
-    pthread_cancel(s_receiverID);
-    pthread_join(s_receiverID, NULL);
+    if (pthread_cancel(s_receiverID) != 0) {
+        exit(1);
+    }
+
+    if (pthread_join(s_receiverID, NULL) != 0) {
+        exit(1);
+    }
 
     free(msg);
     msg = NULL;

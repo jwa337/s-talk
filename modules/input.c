@@ -52,12 +52,19 @@ void Input_init(List* inputLst, pthread_cond_t* bufAvail, pthread_cond_t* itemAv
     s_bufAvail = bufAvail;
     s_itemAvail = itemAvail;
     s_inputMutex = inputMutex;
-    pthread_create(&s_inputID , NULL, Input_thread, NULL);
+    if (pthread_create(&s_inputID , NULL, Input_thread, NULL) != 0) {
+        exit(1);
+    }
 }
 
 void Input_shutdown() {
-    pthread_cancel(s_inputID);
-    pthread_join(s_inputID, NULL);
+    if (pthread_cancel(s_inputID) != 0) {
+        exit(1);
+    }
+    
+    if (pthread_join(s_inputID, NULL) !=0) {
+        exit(1);
+    }
 
     free(msg);
     msg = NULL;

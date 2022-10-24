@@ -46,12 +46,19 @@ void Output_init(List* inputLst, pthread_cond_t* bufAvail, pthread_cond_t* itemA
     s_bufAvail = bufAvail;
     s_itemAvail = itemAvail;
     s_outputMutex = outputMutex;
-    pthread_create(&s_outputID, NULL, Output_thread, NULL);
+    if (pthread_create(&s_outputID, NULL, Output_thread, NULL) != 0) {
+        exit(1);
+    }
 }
 
 void Output_shutdown() {
-    pthread_cancel(s_outputID);
-    pthread_join(s_outputID, NULL);
+    if (pthread_cancel(s_outputID) != 0) {
+        exit(1);
+    }
+
+    if (pthread_join(s_outputID, NULL) != 0) {
+        exit(1);
+    }
 
     free(msg);
     msg = NULL;
