@@ -13,9 +13,10 @@ static pthread_cond_t* s_bufAvail;
 static pthread_cond_t* s_itemAvail;
 static pthread_mutex_t* s_outputMutex;
 
+// printing messages
 void* Output_thread(void* arg) {
     while (1) {
-        // get message from input list
+        // if the output list is empty, wait for receiver thread to receive message from remote socket port
         if (List_count(s_lst) == 0) {
             pthread_mutex_lock(s_outputMutex);
             {
@@ -24,28 +25,39 @@ void* Output_thread(void* arg) {
             pthread_mutex_unlock(s_outputMutex);
         }
 
+        // remove the last message in the output list, since the message in prepended, removing the last message is FIFO
+        // so that the first message received from receive thread gets to print first
         msg = List_trim(s_lst);
+
+        // signal receive thread that there is some space in the output list
         pthread_mutex_lock(s_outputMutex);
         {
             pthread_cond_signal(s_bufAvail);
         }
         pthread_mutex_unlock(s_outputMutex);
 
+        // print the message to screen
         puts(msg);
 
+        // if msg was only the '!', trigger shutdown
         if (msg[0] == '!' && strlen(msg) == 1) {
             TriggerShutdown();
         }
+
+        free(msg);
+        msg = NULL;
     }
     
     return(NULL);
 }
 
 void Output_init(List* inputLst, pthread_cond_t* bufAvail, pthread_cond_t* itemAvail, pthread_mutex_t* outputMutex) {
+    // get parameters
     s_lst = inputLst;
     s_bufAvail = bufAvail;
     s_itemAvail = itemAvail;
     s_outputMutex = outputMutex;
+    
     if (pthread_create(&s_outputID, NULL, Output_thread, NULL) != 0) {
         exit(1);
     }
@@ -62,4 +74,7 @@ void Output_shutdown() {
 
     free(msg);
     msg = NULL;
+    pthread_mutex_destroy(s_outputMutex);
+    pthread_cond_destroy(s_bufAvail);
+    pthread_cond_destroy(s_itemAvail);
 }

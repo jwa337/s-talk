@@ -32,20 +32,27 @@ int main(int argc, char** argv) {
     List* inputLst = List_create();  // for storing data that the user types in the keyboard
     List* outputLst = List_create(); // for storing data that received from UDP from another socket
 
+    // create socket
     struct sockaddr_in s;
     struct sockaddr_in sinRemote;
     int socketDescriptor = Socket_init(atoi(argv[1]), atoi(argv[3]), &s, &sinRemote);
 
+    // initialize input, sender, reciever and output thread
     Input_init(inputLst, &inputBufAvail, &inputItemAvail, &inputMutex);
     Sender_init(&sinRemote, socketDescriptor, inputLst, &inputBufAvail, &inputItemAvail, &inputMutex);
     Receiver_init(&sinRemote, socketDescriptor, outputLst, &outputBufAvail, &outputItemAvail, &outputMutex);
     Output_init(outputLst, &outputBufAvail, &outputItemAvail, &outputMutex);
 
-
+    // wait on the condition variable shutdownCondVar till sender and output thread received '!' and signal for shutdown
     pthread_cond_t shutdownCondVar = PTHREAD_COND_INITIALIZER;
     pthread_mutex_t shutdownMutex = PTHREAD_MUTEX_INITIALIZER;
+    
     WaitForShutDown(&shutdownCondVar, &shutdownMutex);
+    // destroy the mutex and cond var
+    pthread_cond_destroy(&shutdownCondVar);
+    pthread_mutex_destroy(&shutdownMutex);
 
+    // wait for shutdown here once the sender and output thread received '!' and signal for shutdown
     Sender_shutdown();
     Receiver_shutdown();
     Input_shutdown();

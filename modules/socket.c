@@ -2,21 +2,25 @@
 #include <unistd.h>
 #include "socket.h"
 
+// initializing the socket
 int Socket_init(int myPort, int connectPort, struct sockaddr_in* s, struct sockaddr_in* sinRemote) {
-    // initializing the socket
-    memset(s, 0, sizeof(*s)); // clearing out garbage values
+    // clearing out garbage values
+    memset(s, 0, sizeof(*s));
     memset(sinRemote, 0 ,sizeof(*sinRemote));
 
+    // setting attribute of user socket
     s->sin_family = AF_INET;
     s->sin_addr.s_addr = htonl(INADDR_ANY);
     s->sin_port = htons(myPort);
 
+    // set remote socket port with the remote port number user specified
     sinRemote->sin_port = htons(connectPort);
 
-    int s_socketDescriptor = socket(PF_INET, SOCK_DGRAM, 0);
-    bind(s_socketDescriptor, (struct sockaddr*) s, sizeof(struct sockaddr_in));
+    // create socket descriptor
+    int socketDescriptor = socket(PF_INET, SOCK_DGRAM, 0);
+    bind(socketDescriptor, (struct sockaddr*) s, sizeof(struct sockaddr_in));
 
-    return s_socketDescriptor;
+    return socketDescriptor;
 }
 
 void Socket_close(int socketDescriptor) {
